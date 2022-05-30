@@ -9,9 +9,13 @@ export const updateCradsByDnD = (data) => ({
     type: "UPDATE_DND", payload: data
 })
 export const insterNewCardToPlayer = (data) => ({
-    type: ADDNEWCARDTOPLAYER, payload : data
+    type: ADDNEWCARDTOPLAYER, payload: data
 })
 
-export const selectMultiCards = (data) =>({
+export const selectMultiCards = (data) => ({
     type: "SELECTMULTIPLECARDS", payload: data
+})
+
+export const dropedCardsByPlayer = (data) => ({
+    type: "DROPEDCARDS", payload: data
 })

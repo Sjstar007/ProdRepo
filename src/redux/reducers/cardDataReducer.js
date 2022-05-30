@@ -31,7 +31,8 @@ const initialState = {
             id: '4', taskIds: []
         }
     }, // Facilitate reordering of the columns
-    columnOrder: ['1', '2', '3', '4'], restCards: restOfCards
+    columnOrder: ['1', '2', '3', '4'], restCards: restOfCards,
+    DropedCards: []
 }
 
 const cardDataReducer = (state = initialState, action) => {
@@ -55,6 +56,11 @@ const cardDataReducer = (state = initialState, action) => {
         case cardsType.SELECTMULTIPLECARDS:
             return {
                 ...state, tasks: action.payload
+            }
+        case cardsType.DROPEDCARDS:
+            return {
+                ...state,
+                DropedCards: action.payload
             }
         default:
             return state;

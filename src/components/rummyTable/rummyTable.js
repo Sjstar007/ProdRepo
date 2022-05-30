@@ -4,7 +4,7 @@ import userData from './userData';
 import Dnd from './DragNDrop/index';
 import {useSelector,useDispatch} from "react-redux";
 import {setOrSequenceCards} from './setCardsUtils';
-import {insterNewCardToPlayer} from '../../redux/actions/index'
+import {dropedCardsByPlayer, insterNewCardToPlayer} from '../../redux/actions/index'
 export default function Index() {
     let dispatch = useDispatch();
     const [user, setUser] = useState(userData)
@@ -39,6 +39,18 @@ export default function Index() {
 
     const setOrSequence = (cards) => {
         setOrSequenceCards(cards)
+    }
+    const dropSelectedCards = (event,cards) =>{
+        event.preventDefault();
+        let keys = [];
+        Object.values(cards.tasks).map(card => {
+            console.log(card)
+            if(card.isSelected == true){
+               keys.push(card.id)
+            }
+        })
+
+        dispatch(dropedCardsByPlayer(keys))
     }
 
     const getPlayer = (user) => {
@@ -115,7 +127,7 @@ export default function Index() {
                 {!!userData.length && userData.map(user => getPlayer(user))}
                 <div className="playerOptions">
                     <button onClick={setOrSequence(cardDetail)} className="sortbtn">Sort</button>
-                    <button className="dropbtn">Drop</button>
+                    <button className="dropbtn" onClick={e=> dropSelectedCards(e,cardDetail)}>Drop</button>
                 </div>
             </div>
         </div>

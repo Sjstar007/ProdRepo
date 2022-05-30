@@ -10,6 +10,7 @@ export default function Dnd() {
     let dispatch = useDispatch();
 
     const Container = styled.div`display: flex;`
+    const [cardStateData,setCardStateData] = useState(useSelector(state => state.card_data));
 
     const setColumns = (concat) => {
         var columnid = 1;
@@ -49,6 +50,7 @@ export default function Dnd() {
         dispatch(sortCards(result))
 
     }, [])
+
     const cardDetails = useSelector(state => state.card_data);
     const onDragEnd = result => {
 
