@@ -2,9 +2,10 @@ import React, {useEffect, useState, useTransition} from "react";
 import "./main.css";
 import userData from './userData';
 import Dnd from './DragNDrop/index';
-import {useSelector,useDispatch} from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import {setOrSequenceCards} from './setCardsUtils';
 import {dropedCardsByPlayer, insterNewCardToPlayer} from '../../redux/actions/index'
+
 export default function Index() {
     let dispatch = useDispatch();
     const [user, setUser] = useState(userData)
@@ -12,6 +13,7 @@ export default function Index() {
     const [totalPlayer, setTotalPlayer] = useState(userData.length - 1)
     const [timer, setTimer] = useState(0)
     const [cardDetail, setCardDetail] = useState(useSelector(state => state.card_data))
+    const clone  = useSelector(state => state.card_data);
     const setTimerForPlayer = (playerInfo) => {
         if (currentPlayerChance < totalPlayer) {
             setCurrentPlayerChance(currentPlayerChance + 1)
@@ -40,13 +42,12 @@ export default function Index() {
     const setOrSequence = (cards) => {
         setOrSequenceCards(cards)
     }
-    const dropSelectedCards = (event,cards) =>{
+    const dropSelectedCards = (event, cards) => {
         event.preventDefault();
         let keys = [];
         Object.values(cards.tasks).map(card => {
-            console.log(card)
-            if(card.isSelected == true){
-               keys.push(card.id)
+            if (card.isSelected == true) {
+                keys.push(card.id)
             }
         })
 
@@ -70,16 +71,20 @@ export default function Index() {
             <div id={user.userPlayTime}>35</div>
         </div>)
     }
-    const doAddCardToplayer = (event,card) =>{
-         let clickedCardData = cardDetail.restCards[card.id];
-         dispatch(insterNewCardToPlayer(clickedCardData))
+    const doAddCardToplayer = (event, card) => {
+        let clickedCardData = cardDetail.restCards[card.id];
+        dispatch(insterNewCardToPlayer(clickedCardData))
     }
-    const getClosedCards = (card) =>{
-        return (
-            <div className="closedCard" onClick={e => doAddCardToplayer(e,card)}>
-                {card.id}
+    const getClosedCards = (card) => {
+        return (<div className="closedCard" onClick={e => doAddCardToplayer(e, card)}>
+            {card.id}
+        </div>)
+    }
+    const getDropedCards = (cards) => {
+        return(<div className="closedCard">
+                {cards}
             </div>
-        )
+            )
     }
     return (<div className="main">
         <div className="GameNav">
@@ -114,7 +119,9 @@ export default function Index() {
                     <div className="closedDeck">
                         {Object.values(cardDetail.restCards).map((card) => getClosedCards(card))}
                     </div>
-                    <div className="openDeck"/>
+                    <div className="openDeck">
+                        {clone.DropedCards.map((card) => getDropedCards(card))}
+                    </div>
                     <div className="finishSlot">
                         <h3>Finish Slot</h3>
                     </div>
@@ -127,7 +134,7 @@ export default function Index() {
                 {!!userData.length && userData.map(user => getPlayer(user))}
                 <div className="playerOptions">
                     <button onClick={setOrSequence(cardDetail)} className="sortbtn">Sort</button>
-                    <button className="dropbtn" onClick={e=> dropSelectedCards(e,cardDetail)}>Drop</button>
+                    <button className="dropbtn" onClick={e => dropSelectedCards(e, cardDetail)}>Drop</button>
                 </div>
             </div>
         </div>
