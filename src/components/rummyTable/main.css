@@ -106,12 +106,13 @@ body {
     flex-direction: column;
 }
 
-.cardSection .deckSetion, .openCards {
+.cardSection .deckSetion {
     height: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 10%;
+    overflow-x: scroll;
 }
 
 .openCards {
@@ -125,7 +126,7 @@ body {
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 4px 4px 12px 2px rgba(black, 0.60);
-    transition: 0.2s;
+    /*transition: 0.2s;*/
     height: 65px;
     width: 30px;
     border: 1px solid black;
@@ -217,10 +218,10 @@ body {
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 4px 4px 12px 2px rgba(black, 0.60);
-    transition: 0.2s;
+    transition: 1.2s;
     height: 40px;
-    width: 5px;
-    border: 1px solid black;
+    width: 0;
+    /*border: 1px solid black;*/
     position: relative;
     display: flex;
     align-items: center;

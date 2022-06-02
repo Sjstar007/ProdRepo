@@ -1,6 +1,7 @@
 import * as cardsType from "../actions/actionType";
 import arrayShuffle from "array-shuffle";
 import {cardType, cardNumber, cardDataArray} from "../utils/cardDetailsUtil";
+import {REMOVECLOSEDCARDS, REMOVEDROPEDCARDBYPLAYER, REMOVEDROPEDCARDS} from "../actions/actionType";
 
 
 const getObjectForCards = (cardarr) => {
@@ -47,9 +48,13 @@ const cardDataReducer = (state = initialState, action) => {
             }
         case cardsType.ADDNEWCARDTOPLAYER:
             state.tasks[action.payload.id] = action.payload;
-            let order = state.columnOrder.length + 1
-            state.columns[order] = {id: order, taskIds: [action.payload.id]}
-            state.columnOrder.push(order)
+            let order = state.columnOrder.length  + 1
+            if(order <= 6) {
+                state.columns[order] = {id: order, taskIds: [action.payload.id]}
+                state.columnOrder.push(order)
+            }else{
+                state.columns[state.columnOrder.length].taskIds.push(action.payload.id)
+            }
             return {
                 ...state
             }
@@ -61,6 +66,22 @@ const cardDataReducer = (state = initialState, action) => {
             return {
                 ...state,
                 DropedCards: action.payload
+            }
+        case cardsType.REMOVECLOSEDCARDS:
+            return{
+                ...state,
+                restCards: action.payload
+            }
+        case cardsType.REMOVEDROPEDCARDBYPLAYER:
+            return{
+                ...state,
+                tasks: action.payload
+            }
+        case cardsType.SETCARDSINSEQUENCEANDSET:
+            return {
+                ...state,
+                columns: action.payload.newColumn,
+                columnOrder: action.payload.columnOrdr
             }
         default:
             return state;

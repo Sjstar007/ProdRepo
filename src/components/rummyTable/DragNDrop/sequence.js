@@ -8,6 +8,25 @@ function cardTypeCheck(cards) {
     return flag;
 }
 
+function cardImpureSequenceCheck (cards){
+    var seq = [];
+    let flag = true;
+    for (let card of cards) {
+        seq.push(card.index)
+    }
+    let sortSq = seq.sort((a, b) => a - b)
+    let count = 0;
+    for (let i = sortSq[0]; i < sortSq[sortSq.length - 1]; i++) {
+        if (sortSq[count] !== i ) {
+            if(sortSq[count] !== 13){
+                flag = false
+            }
+        }
+        count++;
+    }
+    return flag;
+}
+
 function cardSequenceCheck(cards) {
 
     var seq = [];
@@ -31,7 +50,7 @@ function set(cards) {
 
     let flag = true;
     for (let i = 1; i < cards.length; i++) {
-        if (cards[i - 1].cardName !== cards[i].cardName) {
+        if (cards[i - 1].cardName !== (cards[i].index == 13 ? cards[i - 1].cardName : cards[i].cardName) && cards[i].cardName !== (cards[i - 1].index == 13 ? cards[i].cardName : cards[i - 1].cardName)) {
             flag = false
         }
     }
@@ -48,8 +67,12 @@ function PureSequence(cards) {
     }
 }
 
-function ImpureSequence() {
-
+function ImpureSequence(cards) {
+    if (cardTypeCheck(cards) == true && cardImpureSequenceCheck(cards) == true) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function Set(cards) {

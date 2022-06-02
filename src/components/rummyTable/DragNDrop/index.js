@@ -107,7 +107,7 @@ export default function Dnd() {
 
 
     return (<DragDropContext onDragEnd={onDragEnd}>
-        <Container style={{alignSelf: "center"}}>
+        <Container style={{alignSelf: "center",height: '100%'}}>
             {cardDetails.columnOrder.map(columnId => {
                 const column = cardDetails.columns[columnId]
                 const tasks = column.taskIds.map(taskId => cardDetails.tasks[taskId])

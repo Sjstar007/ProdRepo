@@ -19,3 +19,15 @@ export const selectMultiCards = (data) => ({
 export const dropedCardsByPlayer = (data) => ({
     type: "DROPEDCARDS", payload: data
 })
+
+export const removeClosedCards = (data) => ({
+    type: "REMOVECLOSEDCARDS", payload: data
+})
+
+export const removeDropedCardByPlayer = (data) => ({
+    type: "REMOVEDROPEDCARDBYPLAYER", payload: data
+})
+
+export const setCardsInSeqAndSet = (data) =>({
+ type: "SETCARDSINSEQUENCEANDSET",  payload :data
+})

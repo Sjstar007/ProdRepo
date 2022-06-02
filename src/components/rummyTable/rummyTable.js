@@ -4,7 +4,9 @@ import userData from './userData';
 import Dnd from './DragNDrop/index';
 import {useSelector, useDispatch} from "react-redux";
 import {setOrSequenceCards} from './setCardsUtils';
-import {dropedCardsByPlayer, insterNewCardToPlayer} from '../../redux/actions/index'
+import {
+    dropedCardsByPlayer, removeDropedCardByPlayer, insterNewCardToPlayer, removeClosedCards, setCardsInSeqAndSet
+} from '../../redux/actions/index'
 
 export default function Index() {
     let dispatch = useDispatch();
@@ -13,7 +15,7 @@ export default function Index() {
     const [totalPlayer, setTotalPlayer] = useState(userData.length - 1)
     const [timer, setTimer] = useState(0)
     const [cardDetail, setCardDetail] = useState(useSelector(state => state.card_data))
-    const clone  = useSelector(state => state.card_data);
+    const clone = useSelector(state => state.card_data);
     const setTimerForPlayer = (playerInfo) => {
         if (currentPlayerChance < totalPlayer) {
             setCurrentPlayerChance(currentPlayerChance + 1)
@@ -39,8 +41,10 @@ export default function Index() {
 
     }, [])
 
-    const setOrSequence = (cards) => {
-        setOrSequenceCards(cards)
+    const setOrSequence = (event,cards) => {
+        event.preventDefault()
+        let setAndSeuqence = setOrSequenceCards(cards.tasks)
+        dispatch(setCardsInSeqAndSet(setAndSeuqence))
     }
     const dropSelectedCards = (event, cards) => {
         event.preventDefault();
@@ -50,8 +54,9 @@ export default function Index() {
                 keys.push(card.id)
             }
         })
-
         dispatch(dropedCardsByPlayer(keys))
+        // delete clone.tasks[keys[0]]
+        // dispatch(removeDropedCardByPlayer(clone.tasks))
     }
 
     const getPlayer = (user) => {
@@ -74,6 +79,8 @@ export default function Index() {
     const doAddCardToplayer = (event, card) => {
         let clickedCardData = cardDetail.restCards[card.id];
         dispatch(insterNewCardToPlayer(clickedCardData))
+        delete cardDetail.restCards[card.id]
+        dispatch(removeClosedCards(cardDetail.restCards))
     }
     const getClosedCards = (card) => {
         return (<div className="closedCard" onClick={e => doAddCardToplayer(e, card)}>
@@ -81,10 +88,9 @@ export default function Index() {
         </div>)
     }
     const getDropedCards = (cards) => {
-        return(<div className="closedCard">
-                {cards}
-            </div>
-            )
+        return (<div className="closedCard">
+            {cards}
+        </div>)
     }
     return (<div className="main">
         <div className="GameNav">
@@ -126,14 +132,12 @@ export default function Index() {
                         <h3>Finish Slot</h3>
                     </div>
                 </div>
-
                 <Dnd currentPlayerChance={currentPlayerChance}/>
-
             </div>
             <div className="singlePlayer">
                 {!!userData.length && userData.map(user => getPlayer(user))}
                 <div className="playerOptions">
-                    <button onClick={setOrSequence(cardDetail)} className="sortbtn">Sort</button>
+                    <button onClick={event => setOrSequence(event,cardDetail)} className="sortbtn">Sort</button>
                     <button className="dropbtn" onClick={e => dropSelectedCards(e, cardDetail)}>Drop</button>
                 </div>
             </div>
