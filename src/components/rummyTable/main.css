@@ -188,10 +188,9 @@ body {
 
 .openDeck {
     height: 100px;
-    width: 71px;
-    border: 1px solid #000;
+    display: flex;
     margin-left: 10%;
-    color: white;
+    color: black;
 }
 
 .finishSlot {
@@ -234,6 +233,30 @@ body {
     margin-left: calc(4rem * -1);
 }
 
+.closedCard .number {
+    position: absolute;
+    font-size: 1.5rem;
+}
+
+.closedCard .suit_top {
+    top: 20px;
+    left: 5px;
+    font-size: 1rem;
+}
+
+.closedCard .number.top {
+    top: 10px;
+    left: 5px;
+}
+
+.closedCard .number.bottom {
+    bottom: 10px;
+    right: 10px;
+}
+
+.closedCard .suit {
+    font-size: 1.2rem;
+}
 /* ============================= Profile View ==================================== */
 
 .time {

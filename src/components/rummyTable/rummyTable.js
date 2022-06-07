@@ -5,7 +5,12 @@ import Dnd from './DragNDrop/index';
 import {useSelector, useDispatch} from "react-redux";
 import {setOrSequenceCards} from './setCardsUtils';
 import {
-    dropedCardsByPlayer, removeDropedCardByPlayer, insterNewCardToPlayer, removeClosedCards, setCardsInSeqAndSet
+    dropedCardsByPlayer,
+    removeDropedCardByPlayer,
+    insterNewCardToPlayer,
+    removeClosedCards,
+    setCardsInSeqAndSet,
+    sortCards
 } from '../../redux/actions/index'
 
 export default function Index() {
@@ -13,18 +18,21 @@ export default function Index() {
     const [user, setUser] = useState(userData)
     const [currentPlayerChance, setCurrentPlayerChance] = useState(0)
     const [totalPlayer, setTotalPlayer] = useState(userData.length - 1)
-    const [timer, setTimer] = useState(0)
+    const [timer,setTimer] = useState(0)
     const [cardDetail, setCardDetail] = useState(useSelector(state => state.card_data))
     const clone = useSelector(state => state.card_data);
+
+
+
     const setTimerForPlayer = (playerInfo) => {
         if (currentPlayerChance < totalPlayer) {
             setCurrentPlayerChance(currentPlayerChance + 1)
         } else {
-            console.log("go it")
+            console.log("got it")
             setCurrentPlayerChance(0)
         }
         for (let i = 1; i <= 35; i++) {
-            setTimeout(() => {
+             setTimeout(() => {
                 let seconds = document.getElementById(playerInfo.userPlayTime);
                 let ss = document.getElementById(playerInfo.userName)
                 seconds.innerHTML = (35 - i);
@@ -35,30 +43,41 @@ export default function Index() {
 
     useEffect(() => {
         console.log(cardDetail)
-        setInterval(() => {
-            setTimerForPlayer(user[currentPlayerChance])
-        }, 35000)
+        // setInterval(() => {
+        //     setTimerForPlayer(user[currentPlayerChance])
+        // }, 35000)
 
     }, [])
 
     const setOrSequence = (event,cards) => {
         event.preventDefault()
-        let setAndSeuqence = setOrSequenceCards(cards.tasks)
+        let setAndSeuqence = setOrSequenceCards(cards,cardDetail.wildCards,cardDetail.handCards)
+        console.log(setAndSeuqence)
         dispatch(setCardsInSeqAndSet(setAndSeuqence))
     }
     const dropSelectedCards = (event, cards) => {
         event.preventDefault();
+        console.log(cards)
         let keys = [];
-        Object.values(cards.tasks).map(card => {
+        Object.values(cards.handCards).map(card => {
             if (card.isSelected == true) {
-                keys.push(card.id)
+                keys.push(card.index)
             }
         })
         dispatch(dropedCardsByPlayer(keys))
-        // delete clone.tasks[keys[0]]
+        let newColumn = {}
+        // delete clone.handCards[keys[0]]
+        Object.keys(clone.columns).map((column,id)=>{
+            return  Object.values(clone.columns[column].cardsId).map((data,index) => {
+                if(data === keys[0]) {
+                    clone.columns[column].cardsId.splice(index,1)
+                }
+            })
+        })
+        console.log(clone)
         // dispatch(removeDropedCardByPlayer(clone.tasks))
-    }
 
+    }
     const getPlayer = (user) => {
         return (<div className="time" key={user.userId}>
             {/* <div className="circle" > */}
@@ -77,20 +96,26 @@ export default function Index() {
         </div>)
     }
     const doAddCardToplayer = (event, card) => {
-        let clickedCardData = cardDetail.restCards[card.id];
+        let clickedCardData = cardDetail.restCards[card.index];
         dispatch(insterNewCardToPlayer(clickedCardData))
-        delete cardDetail.restCards[card.id]
+        delete cardDetail.restCards[card.index]
         dispatch(removeClosedCards(cardDetail.restCards))
     }
     const getClosedCards = (card) => {
         return (<div className="closedCard" onClick={e => doAddCardToplayer(e, card)}>
-            {card.id}
+            {card.index === 53 ? <img src="https://img.icons8.com/color/48/undefined/joker.png"/>:card.id}
         </div>)
     }
     const getDropedCards = (cards) => {
-        return (<div className="closedCard">
-            {cards}
-        </div>)
+        return (
+            <div className="closedCard">
+                <span className="number top">{cardDetail.handCards[cards].cardName}</span>
+                <p className="suit_top">{cardDetail.handCards[cards].icon}</p>
+                <p className="suit">{cardDetail.handCards[cards].icon}</p>
+                <span className="number bottom">{cardDetail.handCards[cards].cardName}</span>
+            </div>
+        )
+
     }
     return (<div className="main">
         <div className="GameNav">
@@ -132,7 +157,7 @@ export default function Index() {
                         <h3>Finish Slot</h3>
                     </div>
                 </div>
-                <Dnd currentPlayerChance={currentPlayerChance}/>
+                <Dnd currentPlayerChance={currentPlayerChance} />
             </div>
             <div className="singlePlayer">
                 {!!userData.length && userData.map(user => getPlayer(user))}

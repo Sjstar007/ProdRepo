@@ -3,13 +3,13 @@ const cardNumber = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q',
 const cardDataArray = [];
 const shuffleArray = require('array-shuffle')
 
-let i = Math.floor(Math.random() * 13);
-let joker = cardNumber[i]
-cardNumber.push(joker + 'j')
+// let i = Math.floor(Math.random() * 13);
+// let joker = cardNumber[i]
+// cardNumber.push(joker + 'j')
 var colour = "balck";
 const createCardData = () => {
+    let idx = 1;
     for (let type of cardType) {
-        let idx = 0;
         for (let number of cardNumber) {
             if (type === '❤' || type === '♦') {
                 colour = "red";
@@ -24,11 +24,11 @@ const createCardData = () => {
         }
     }
 
+    cardDataArray.push({
+        cardName: 'Jkr', icon: '*', color: 'black', index: 53, isSelected: false, id: '*'
+    })
 }
 
-cardDataArray.push({
-    cardName: 'Jkr', icon: 'jkr', color: 'black', index: 14, isSelected: false, id: 'jkr'
-})
 console.log(cardDataArray)
 createCardData()
 

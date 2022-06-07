@@ -12,20 +12,21 @@ const Container = styled.div`
   transition: background-color 0.2s ease;
 `
 
-export default function Task ({key, cardDetails, index}) {
+export default function Cards ({key, cardDetails, index, wildCard}) {
     let dispatch = useDispatch();
     const [cardStateData,setCardStateData] = useState(useSelector(state => state.card_data));
     const  clickMe = (event,cards) =>{
         event.preventDefault()
         cards.isSelected = true;
-        cardStateData.tasks[cards.id] = cards
-        dispatch(selectMultiCards(cardStateData.tasks))
-        setCardStateData({...cardStateData, tasks: cardStateData.tasks})
+        cardStateData.handCards[cards.index] = cards
+        dispatch(selectMultiCards(cardStateData.handCards))
+        setCardStateData({...cardStateData, handCards: cardStateData.handCards})
     }
-        const isDragDisabled = cardDetails.id === false
+        const isDragDisabled = cardDetails.index === false
+
         return (
             <Draggable
-                draggableId={cardDetails.id}
+                draggableId={`${cardDetails.index}`}
                 index={index}
                 isDragDisabled={isDragDisabled}
             >
@@ -44,7 +45,7 @@ export default function Task ({key, cardDetails, index}) {
                 >
                     {/*{this.props.task.icon+this.props.task.cardName}*/}
                     <span className="number top">{cardDetails.cardName}</span>
-                    <p className="suit_top">{cardDetails.icon}</p>
+                    <p className="suit_top">{wildCard.includes(cardDetails.index) || cardDetails.index === 53 ? <img src="https://img.icons8.com/color/48/undefined/joker.png"/> : cardDetails.icon}</p>
                     <p className="suit">{cardDetails.icon}</p>
                     <span className="number bottom">{cardDetails.cardName}</span>
 

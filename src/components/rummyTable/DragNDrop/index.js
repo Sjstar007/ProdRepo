@@ -11,17 +11,25 @@ export default function Dnd() {
 
     const Container = styled.div`display: flex;`
     const [cardStateData,setCardStateData] = useState(useSelector(state => state.card_data));
-
+    const cardDetail = useSelector(state => state.card_data);
+    const [wildCards,setWildCards] = useState([])
+    const getWildCards = () =>{
+        let wildCardArray = [];
+        for(let i=0;i<52;i+=13){
+            wildCardArray.push(cardDetail.wildCards+i)
+        }
+        setWildCards(wildCardArray)
+    }
     const setColumns = (concat) => {
         var columnid = 1;
         var newState = {};
         for (let i of concat) {
             let crdid = [];
             for (let arr of i) {
-                crdid.push(arr.id)
+                crdid.push(arr.index)
             }
             newState[columnid] = {
-                id: `${columnid}`, taskIds: crdid
+                id: `${columnid}`, cardsId: crdid
             }
             columnid++;
         }
@@ -32,9 +40,9 @@ export default function Dnd() {
         let concat = [];
         for (let type of cardType) {
             let cardSet = {};
-            for (let card in state.tasks) {
-                if (state.tasks[card].icon === type) {
-                    cardSet[card] = state.tasks[card]
+            for (let card in state.handCards) {
+                if (state.handCards[card].icon === type) {
+                    cardSet[card] = state.handCards[card]
                 }
             }
             let sortedSet = Object.values(cardSet).sort((a, b) => a.index - b.index)
@@ -46,7 +54,7 @@ export default function Dnd() {
     useEffect(() => {
         const data = store.getState().card_data
         let result = getClumnData(data)
-        console.log(result)
+        getWildCards()
         dispatch(sortCards(result))
 
     }, [])
@@ -66,12 +74,12 @@ export default function Dnd() {
         const finish = cardDetails.columns[destination.droppableId]
 
         if (start === finish) {
-            const newTaskIds = Array.from(start.taskIds)
-            newTaskIds.splice(source.index, 1)
-            newTaskIds.splice(destination.index, 0, draggableId)
+            const newcardsId = Array.from(start.cardsId)
+            newcardsId.splice(source.index, 1)
+            newcardsId.splice(destination.index, 0, draggableId)
 
             const newColumn = {
-                ...start, taskIds: newTaskIds
+                ...start, cardsId: newcardsId
             }
             const newState = {
                 ...cardDetails, columns: {
@@ -85,15 +93,15 @@ export default function Dnd() {
         }
 
         // Moving from one list to another
-        const startTaskIds = Array.from(start.taskIds)
-        startTaskIds.splice(source.index, 1)
+        const startcardsId = Array.from(start.cardsId)
+        startcardsId.splice(source.index, 1)
         const newStart = {
-            ...start, taskIds: startTaskIds
+            ...start, cardsId: startcardsId
         }
-        const finishTaskIds = Array.from(finish.taskIds)
-        finishTaskIds.splice(destination.index, 0, draggableId)
+        const finishcardsId = Array.from(finish.cardsId)
+        finishcardsId.splice(destination.index, 0, draggableId)
         const newFinish = {
-            ...finish, taskIds: finishTaskIds
+            ...finish, cardsId: finishcardsId
         }
         const newState = {
             ...cardDetails, columns: {
@@ -105,14 +113,13 @@ export default function Dnd() {
         // this.setState(newState)
     }
 
-
     return (<DragDropContext onDragEnd={onDragEnd}>
         <Container style={{alignSelf: "center",height: '100%'}}>
             {cardDetails.columnOrder.map(columnId => {
                 const column = cardDetails.columns[columnId]
-                const tasks = column.taskIds.map(taskId => cardDetails.tasks[taskId])
+                const handCards = column.cardsId.map(taskId => cardDetails.handCards[taskId])
                 return (<div className="openCards">
-                    <Column key={column.id} column={column} tasks={tasks}/>
+                    <Column key={column.id} column={column} handCards={handCards} wildCards={wildCards}/>
                 </div>)
             })}
         </Container>

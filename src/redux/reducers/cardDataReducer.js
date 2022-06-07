@@ -7,33 +7,49 @@ import {REMOVECLOSEDCARDS, REMOVEDROPEDCARDBYPLAYER, REMOVEDROPEDCARDS} from "..
 const getObjectForCards = (cardarr) => {
     var cardData = {};
     for (let arr of cardarr) {
-        let cardicon = arr.icon
-        let cardname = arr.cardName
-        let key = cardicon + cardname
+        let cardindex = arr.index
+        let key = cardindex
         cardData[key] = arr
     }
     return cardData
 }
+
 const allCards = arrayShuffle(cardDataArray);
-console.log(allCards)
 const object = getObjectForCards(allCards.splice(0, 13))
 const restOfCards = getObjectForCards(allCards)
 
+function randomIntFromInterval(min, max) { // min and max included
+    let a = Math.floor(Math.random() * (max - min + 1) + min)
+    // let joker = [];
+    // for(let i = 0;i<52;i+=13){
+    //     joker.push(i)
+    // }
+    // for(let j of joker){
+    //     if(object[j]) {
+    //        object[j].icon = '*'
+    //         console.log(object[j])
+    //     }
+    // }
+    return a;
+}
+
 const initialState = {
-    tasks: object, columns: {
+    handCards: object, columns: {
         '1': {
-            id: '1', taskIds: []
-            // taskIds: ['♣J','♦5','♠2', '♦3', '♣Q', '♠J']
+            id: '1', cardsId: []
+            // cardsId: [1,2,4,5,7]
         }, '2': {
-            id: '2', taskIds: []
+            id: '2', cardsId: []
         }, '3': {
-            id: '3', taskIds: []
+            id: '3', cardsId: []
         }, '4': {
-            id: '4', taskIds: []
+            id: '4', cardsId: []
         }
     }, // Facilitate reordering of the columns
-    columnOrder: ['1', '2', '3', '4'], restCards: restOfCards,
-    DropedCards: []
+    columnOrder: ['1', '2', '3', '4'],
+    restCards: restOfCards,
+    DropedCards: [],
+    wildCards: randomIntFromInterval(1, 13),
 }
 
 const cardDataReducer = (state = initialState, action) => {
@@ -47,20 +63,20 @@ const cardDataReducer = (state = initialState, action) => {
                 ...action.payload
             }
         case cardsType.ADDNEWCARDTOPLAYER:
-            state.tasks[action.payload.id] = action.payload;
-            let order = state.columnOrder.length  + 1
-            if(order <= 6) {
-                state.columns[order] = {id: order, taskIds: [action.payload.id]}
+            state.handCards[action.payload.index] = action.payload;
+            let order = state.columnOrder.length + 1
+            if (order <= 6) {
+                state.columns[order] = {id: order, cardsId: [action.payload.index]}
                 state.columnOrder.push(order)
-            }else{
-                state.columns[state.columnOrder.length].taskIds.push(action.payload.id)
+            } else {
+                state.columns[state.columnOrder.length].cardsId.push(action.payload.index)
             }
             return {
                 ...state
             }
         case cardsType.SELECTMULTIPLECARDS:
             return {
-                ...state, tasks: action.payload
+                ...state, handCards: action.payload
             }
         case cardsType.DROPEDCARDS:
             return {
@@ -68,20 +84,20 @@ const cardDataReducer = (state = initialState, action) => {
                 DropedCards: action.payload
             }
         case cardsType.REMOVECLOSEDCARDS:
-            return{
+            return {
                 ...state,
                 restCards: action.payload
             }
         case cardsType.REMOVEDROPEDCARDBYPLAYER:
-            return{
+            return {
                 ...state,
-                tasks: action.payload
+                handCards: action.payload
             }
         case cardsType.SETCARDSINSEQUENCEANDSET:
             return {
                 ...state,
-                columns: action.payload.newColumn,
-                columnOrder: action.payload.columnOrdr
+                columns: action.payload.columns,
+                columnOrder: action.payload.columnOrder
             }
         default:
             return state;

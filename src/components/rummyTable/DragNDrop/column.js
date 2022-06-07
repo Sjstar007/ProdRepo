@@ -1,8 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import Task from './task'
+import Cards from './cards'
 import {Droppable} from 'react-beautiful-dnd'
 import {sequence} from './sequence';
+import {useSelector} from "react-redux";
 
 const Container = styled.div`
   margin: 8px;
@@ -16,7 +17,7 @@ const Container = styled.div`
 const Title = styled.h3`
   //padding: 8px;
 `
-const TaskList = styled.div`
+const CardsGroup = styled.div`
   transition: background-color 0.2s ease;
   background-color: ${props => props.isDraggingOver ? 'skyblue' : 'white'}
   flex-grow: 1;
@@ -28,22 +29,25 @@ const getListStyle = (isDraggingOver) => ({
 });
 
 export default class Column extends React.Component {
+    constructor(props) {
+        super(props);
+    }
 
     render() {
         return (<Container style={{border: "none", width: "auto"}}>
-            <h5 style={{color:"#fff"}}>{sequence(this.props.tasks)}</h5>
+            <h5 style={{color:"#fff"}}>{sequence(this.props.handCards,this.props.wildCards)}</h5>
             <Droppable droppableId={this.props.column.id} type="TASK" direction="horizontal"
             >
-                {(provided, snapshot) => (<TaskList
+                {(provided, snapshot) => (<CardsGroup
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     // isDraggingOver={snapshot.isDraggingOver}
                     style={getListStyle(snapshot.isDraggingOver)}
 
                 >
-                    {this.props.tasks.map((task, index) => (<Task key={task.id}  cardDetails={task} index={index}/>))}
+                    {this.props.handCards.map((card, index) => (<Cards key={card.index}  cardDetails={card} index={index} wildCard={this.props.wildCards}/>))}
                     {provided.placeholder}
-                </TaskList>)}
+                </CardsGroup>)}
             </Droppable>
 
 
