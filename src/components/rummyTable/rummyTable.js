@@ -17,37 +17,62 @@ export default function Index() {
     let dispatch = useDispatch();
     const [user, setUser] = useState(userData)
     const [currentPlayerChance, setCurrentPlayerChance] = useState(0)
-    const [totalPlayer, setTotalPlayer] = useState(userData.length - 1)
+    const [totalPlayer, setTotalPlayer] = useState(userData.length)
     const [timer,setTimer] = useState(0)
     const [cardDetail, setCardDetail] = useState(useSelector(state => state.card_data))
     const clone = useSelector(state => state.card_data);
+    const [wildCardArray,setWildCardArray] = useState([])
+    const [toolTipOption,setToolTipOption] = useState(false)
 
+    const getWildCard = () =>{
+        let wildCardArray = [];
+        for(let i=0;i<52;i+=13){
+            wildCardArray.push(cardDetail.wildCards+i)
+        }
+        setWildCardArray(wildCardArray)
+    }
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-    const setTimerForPlayer = (playerInfo) => {
+    const setTimerForPlayer = async (playerInfo) => {
+        for (let i = 1; i <= 35; i++) {
+            // setTimeout(() => {
+            //     let seconds = document.getElementById(playerInfo.userPlayTime);
+            //     let ss = document.getElementById(playerInfo.userName)
+            //     seconds.innerHTML = (35 - i);
+            //     ss.style.strokeDashoffset = i * 12.5
+            // }, i * 1000)
+            let seconds = document.getElementById(playerInfo.userPlayTime);
+            let ss = document.getElementById(playerInfo.userName)
+            seconds.innerHTML = (35 - i);
+            ss.style.strokeDashoffset = i * 12.5
+            await sleep(1000);
+        }
         if (currentPlayerChance < totalPlayer) {
-            setCurrentPlayerChance(currentPlayerChance + 1)
+            setCurrentPlayerChance(1)
+            return
         } else {
             console.log("got it")
             setCurrentPlayerChance(0)
-        }
-        for (let i = 1; i <= 35; i++) {
-             setTimeout(() => {
-                let seconds = document.getElementById(playerInfo.userPlayTime);
-                let ss = document.getElementById(playerInfo.userName)
-                seconds.innerHTML = (35 - i);
-                ss.style.strokeDashoffset = i * 12.5
-            }, i * 1000)
+            return
         }
     }
 
     useEffect(() => {
-        console.log(cardDetail)
+        getWildCard()
+    },[])
+
+    const startGame = async () => {
         // setInterval(() => {
         //     setTimerForPlayer(user[currentPlayerChance])
-        // }, 35000)
-
-    }, [])
+        // }, 36000)
+        while (true){
+            await setTimerForPlayer(user[currentPlayerChance])
+            await sleep(36000);
+        }
+    }
 
     const setOrSequence = (event,cards) => {
         event.preventDefault()
@@ -117,6 +142,21 @@ export default function Index() {
         )
 
     }
+
+    const getWildCards = (card) =>{
+        return (
+            <div className="closedCard">
+                <span className="number top">{cardDetail.deckOfCards[card].cardName}</span>
+                <p className="suit_top">{cardDetail.deckOfCards[card].icon}</p>
+                <p className="suit"><img src="https://img.icons8.com/color/48/undefined/joker.png"/></p>
+                <span className="number bottom">{cardDetail.deckOfCards[card].cardName}</span>
+            </div>
+        )
+    }
+    const showToolTip = (event) =>{
+        event.preventDefault();
+        setToolTipOption(!toolTipOption)
+    }
     return (<div className="main">
         <div className="GameNav">
             <div className="AddCash">
@@ -142,16 +182,26 @@ export default function Index() {
             <div className="Exit">
                 <h5>Leave Table</h5>
             </div>
+            <button onClick={startGame()}>Start Game</button>
         </div>
         <div className="TablePool">
             <div className="multiPlayer"/>
             <div className="cardSection">
                 <div className="deckSetion">
                     <div className="closedDeck">
-                        {Object.values(cardDetail.restCards).map((card) => getClosedCards(card))}
+                        <div >
+                            <button className="checkWildCard" onMouseUpCapture={e => showToolTip(e)}>?</button>
+                        </div>
+                        <div className="wildCards" >
+                            {wildCardArray.map(card=> getWildCards(card))}
+                        </div>
+                        {Object.values(cardDetail.restCards).reverse().map((card) => getClosedCards(card))}
+                        {toolTipOption && (<div className="messageBox">
+                                Working
+                            </div>)}
                     </div>
                     <div className="openDeck">
-                        {clone.DropedCards.map((card) => getDropedCards(card))}
+                        {clone.DropedCards.reverse().map((card) => getDropedCards(card))}
                     </div>
                     <div className="finishSlot">
                         <h3>Finish Slot</h3>

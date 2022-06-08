@@ -30,7 +30,6 @@ function cardImpureSequenceCheck(cards, wildCard) {
         seq.push(card.index)
     }
     let sortSq = seq.sort((a, b) => a - b)
-    console.log(sortSq + "  " + wildCard)
     for (let i = 0; i < sortSq.length - 1; i++) {
         // console.log(seq[i]);
         if (sortSq[i] === 53 || wildCard.includes(sortSq[i]) || wildCard.includes(sortSq[i + 1])) {

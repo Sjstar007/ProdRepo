@@ -6,13 +6,15 @@ import store from '../../../redux/store';
 import styled from 'styled-components'
 import Column from "./column";
 
-export default function Dnd() {
+export default function Dnd(currentPlayerChance) {
     let dispatch = useDispatch();
-
+    console.log(currentPlayerChance)
     const Container = styled.div`display: flex;`
     const [cardStateData,setCardStateData] = useState(useSelector(state => state.card_data));
     const cardDetail = useSelector(state => state.card_data);
-    const [wildCards,setWildCards] = useState([])
+    const userData = useSelector(state => state.user_data);
+    const [wildCards,setWildCards] = useState([]);
+
     const getWildCards = () =>{
         let wildCardArray = [];
         for(let i=0;i<52;i+=13){
@@ -51,12 +53,18 @@ export default function Dnd() {
         let result = setColumns(concat)
         return result;
     }
+    const changePlayerCards = (currentPlayer) => {
+
+    }
+
+    useEffect(()=>{
+        changePlayerCards(currentPlayerChance)
+    },[currentPlayerChance])
     useEffect(() => {
         const data = store.getState().card_data
         let result = getClumnData(data)
         getWildCards()
         dispatch(sortCards(result))
-
     }, [])
 
     const cardDetails = useSelector(state => state.card_data);

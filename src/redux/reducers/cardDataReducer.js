@@ -13,27 +13,18 @@ const getObjectForCards = (cardarr) => {
     }
     return cardData
 }
-
+const cardDeack = getObjectForCards(cardDataArray);
 const allCards = arrayShuffle(cardDataArray);
 const object = getObjectForCards(allCards.splice(0, 13))
 const restOfCards = getObjectForCards(allCards)
 
 function randomIntFromInterval(min, max) { // min and max included
     let a = Math.floor(Math.random() * (max - min + 1) + min)
-    // let joker = [];
-    // for(let i = 0;i<52;i+=13){
-    //     joker.push(i)
-    // }
-    // for(let j of joker){
-    //     if(object[j]) {
-    //        object[j].icon = '*'
-    //         console.log(object[j])
-    //     }
-    // }
     return a;
 }
 
 const initialState = {
+    deckOfCards: cardDeack,
     handCards: object, columns: {
         '1': {
             id: '1', cardsId: []
