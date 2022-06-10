@@ -39,18 +39,18 @@ export default function Index() {
         }
         if (currentPlayerChance < totalPlayer) {
             setCurrentPlayerChance(1)
-            return
         } else {
             setCurrentPlayerChance(0)
-            return
         }
+        return
     }
 
     useEffect(() => {
         getWildCard()
     }, [])
 
-    const startGame = async () => {
+    const startGame = async (event) => {
+        event.preventDefault()
         while (true) {
             await setTimerForPlayer(cardDetail.userData[currentPlayerChance])
             await sleep(35000)
@@ -164,7 +164,7 @@ export default function Index() {
             <div className="Exit">
                 <h5>Leave Table</h5>
             </div>
-            <button onClick={startGame()}>Start Game</button>
+            <button onClick={e => startGame(e)}>Start Game</button>
         </div>
         <div className="TablePool">
             <div className="multiPlayer"/>
