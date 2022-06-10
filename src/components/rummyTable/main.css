@@ -322,12 +322,14 @@ body {
     z-index: 1;
 }
 .messageBox{
-    height: 60px;
+    height: 100px;
     align-self: flex-start;
     z-index: 1;
     left: -16px;
-    width: 200px;
-    background: white;
+    width: 300px;
     border-radius: 5px;
     padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }

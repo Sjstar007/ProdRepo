@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, memo,useRef} from 'react'
 import {DragDropContext} from 'react-beautiful-dnd'
 import {useDispatch, useSelector} from 'react-redux';
 import {getInitialState, sortCards, updateCradsByDnD} from '../../../redux/actions/index.js'
@@ -6,22 +6,34 @@ import store from '../../../redux/store';
 import styled from 'styled-components'
 import Column from "./column";
 
-export default function Dnd(currentPlayerChance) {
+function Dnd(currentPlayerChance) {
     let dispatch = useDispatch();
-    console.log(currentPlayerChance)
     const Container = styled.div`display: flex;`
-    const [cardStateData,setCardStateData] = useState(useSelector(state => state.card_data));
     const cardDetail = useSelector(state => state.card_data);
-    const userData = useSelector(state => state.user_data);
-    const [wildCards,setWildCards] = useState([]);
+    const cardDetails = useSelector(state => state.card_data);
+    const [wildCards, setWildCards] = useState([]);
+    const prevCount = usePrevious(currentPlayerChance);
+    // const [playerTurn,setPlayerTurn] = useState(prevCount)
+    let flag = usePrevious(true);
 
-    const getWildCards = () =>{
+    function  usePrevious (value) {
+        const ref = useRef();
+        useEffect(() => {
+            ref.current = value;
+        }, [value]);
+        return ref.current;
+    }
+
+
+    const getWildCards = () => {
         let wildCardArray = [];
-        for(let i=0;i<52;i+=13){
-            wildCardArray.push(cardDetail.wildCards+i)
+        for (let i = 0; i < 52; i += 13) {
+            wildCardArray.push(cardDetail.wildCards + i)
         }
         setWildCards(wildCardArray)
+
     }
+
     const setColumns = (concat) => {
         var columnid = 1;
         var newState = {};
@@ -36,15 +48,17 @@ export default function Dnd(currentPlayerChance) {
             columnid++;
         }
         return newState;
+
     }
+
     const getClumnData = (state) => {
         let cardType = ["❤", "♣", "♦", "♠"];
         let concat = [];
         for (let type of cardType) {
             let cardSet = {};
-            for (let card in state.handCards) {
-                if (state.handCards[card].icon === type) {
-                    cardSet[card] = state.handCards[card]
+            for (let card in state) {
+                if (state[card].icon === type) {
+                    cardSet[card] = state[card]
                 }
             }
             let sortedSet = Object.values(cardSet).sort((a, b) => a.index - b.index)
@@ -53,25 +67,22 @@ export default function Dnd(currentPlayerChance) {
         let result = setColumns(concat)
         return result;
     }
-    const changePlayerCards = (currentPlayer) => {
-
-    }
-
-    useEffect(()=>{
-        changePlayerCards(currentPlayerChance)
-    },[currentPlayerChance])
+console.log(currentPlayerChance)
     useEffect(() => {
+        // let isCancled = false;
         const data = store.getState().card_data
-        let result = getClumnData(data)
+        let result = getClumnData(currentPlayerChance.currentPlayerChance.userCardSet)
         getWildCards()
-        dispatch(sortCards(result))
-    }, [])
+        if(prevCount == undefined || JSON.stringify(prevCount) !== JSON.stringify(currentPlayerChance)){
+            dispatch(sortCards(result, currentPlayerChance.currentPlayerChance.userId, currentPlayerChance.currentPlayerChance.userCardSet, currentPlayerChance.currentPlayerChance.columnOrder))
+        }
+        // return ()=>{
+        //     isCancled = true;
+        // }
+    }, [currentPlayerChance])
 
-    const cardDetails = useSelector(state => state.card_data);
     const onDragEnd = result => {
-
         const {destination, source, draggableId} = result
-
         if (!destination) {
             return
         }
@@ -80,12 +91,10 @@ export default function Dnd(currentPlayerChance) {
         }
         const start = cardDetails.columns[source.droppableId]
         const finish = cardDetails.columns[destination.droppableId]
-
         if (start === finish) {
             const newcardsId = Array.from(start.cardsId)
             newcardsId.splice(source.index, 1)
             newcardsId.splice(destination.index, 0, draggableId)
-
             const newColumn = {
                 ...start, cardsId: newcardsId
             }
@@ -94,13 +103,10 @@ export default function Dnd(currentPlayerChance) {
                     ...cardDetails.columns, [newColumn.id]: newColumn
                 }
             }
-            console.log(newState)
             dispatch(updateCradsByDnD(newState))
-            // this.setState(newState)
             return
         }
-
-        // Moving from one list to another
+        //---------------------- Moving from one list to another------------------------------
         const startcardsId = Array.from(start.cardsId)
         startcardsId.splice(source.index, 1)
         const newStart = {
@@ -116,14 +122,12 @@ export default function Dnd(currentPlayerChance) {
                 ...cardDetails.columns, [newStart.id]: newStart, [newFinish.id]: newFinish
             }
         }
-        console.log(newState)
         dispatch(updateCradsByDnD(newState))
-        // this.setState(newState)
     }
 
     return (<DragDropContext onDragEnd={onDragEnd}>
-        <Container style={{alignSelf: "center",height: '100%'}}>
-            {cardDetails.columnOrder.map(columnId => {
+        <Container style={{alignSelf: "center", height: '100%'}}>
+            { cardDetails.columnOrder.map(columnId => {
                 const column = cardDetails.columns[columnId]
                 const handCards = column.cardsId.map(taskId => cardDetails.handCards[taskId])
                 return (<div className="openCards">
@@ -133,4 +137,4 @@ export default function Dnd(currentPlayerChance) {
         </Container>
     </DragDropContext>)
 }
-
+export default memo(Dnd);

@@ -31,8 +31,7 @@ function cardImpureSequenceCheck(cards, wildCard) {
     }
     let sortSq = seq.sort((a, b) => a - b)
     for (let i = 0; i < sortSq.length - 1; i++) {
-        // console.log(seq[i]);
-        if (sortSq[i] === 53 || wildCard.includes(sortSq[i]) || wildCard.includes(sortSq[i + 1])) {
+        if (sortSq[i] === 53 || sortSq[i+1] === 53 || wildCard.includes(sortSq[i]) || wildCard.includes(sortSq[i + 1])) {
         } else if (sortSq[i + 1] - sortSq[i] !== 1) {
             // && (!wildCard.includes(sortSq[i + 1]) && wildCard.includes(sortSq)) && ()) { //  10,11,22  9,22,35,48
             return false
@@ -41,7 +40,7 @@ function cardImpureSequenceCheck(cards, wildCard) {
     return true;
 }
 
-function cardSequenceCheck(cards) {
+function cardSequenceCheck(cards,wildCard) {
     var seq = [];
     let flag = true;
     for (let card of cards) {
@@ -50,7 +49,7 @@ function cardSequenceCheck(cards) {
     let sortSq = seq.sort((a, b) => a - b)
     let count = 0;
     for (let i = sortSq[0]; i < sortSq[sortSq.length - 1]; i++) {
-        if (sortSq[count] !== i) {
+        if (sortSq[count] !== i || wildCard.includes(sortSq[count])) {
             flag = false
         }
         count++;
@@ -68,8 +67,8 @@ function set(cards) {
     return flag;
 }
 
-function PureSequence(cards) {
-    if (cardTypeCheck(cards) === true && cardSequenceCheck(cards) === true) {
+function PureSequence(cards,wildCard) {
+    if (cardTypeCheck(cards) === true && cardSequenceCheck(cards,wildCard) === true) {
         return true;
     } else {
         return false;
@@ -98,7 +97,7 @@ function PureSet(cards) {
 
 const sequence = (cardArrayForSequence, wildCard) => {
     if (cardArrayForSequence.length >= 3) {
-        if (PureSequence(cardArrayForSequence)) {
+        if (PureSequence(cardArrayForSequence,wildCard)) {
             return "PureSequence";
         } else if (ImpureSequence(cardArrayForSequence, wildCard)) {
             return "ImpureSequence"

@@ -2,8 +2,8 @@ import * as actionType from './actionType'
 import {ADDNEWCARDTOPLAYER, SELECTMULTIPLECARDS} from "./actionType";
 import userData from "../../components/rummyTable/userData";
 
-export const sortCards = (data) => ({
-    type: "SORT_CARDS", payload: data
+export const sortCards = (data,id,cardsSet,columnOrder) => ({
+    type: "SORT_CARDS", payload: data , id:id, cardsSet:cardsSet,columnOrder:columnOrder
 })
 
 export const updateCradsByDnD = (data) => ({

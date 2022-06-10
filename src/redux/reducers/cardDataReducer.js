@@ -15,7 +15,8 @@ const getObjectForCards = (cardarr) => {
 }
 const cardDeack = getObjectForCards(cardDataArray);
 const allCards = arrayShuffle(cardDataArray);
-const object = getObjectForCards(allCards.splice(0, 13))
+const object1 = getObjectForCards(allCards.splice(0, 13))
+const object2 = getObjectForCards(allCards.splice(0, 13))
 const restOfCards = getObjectForCards(allCards)
 
 function randomIntFromInterval(min, max) { // min and max included
@@ -24,30 +25,36 @@ function randomIntFromInterval(min, max) { // min and max included
 }
 
 const initialState = {
-    deckOfCards: cardDeack,
-    handCards: object, columns: {
-        '1': {
-            id: '1', cardsId: []
-            // cardsId: [1,2,4,5,7]
-        }, '2': {
-            id: '2', cardsId: []
-        }, '3': {
-            id: '3', cardsId: []
-        }, '4': {
-            id: '4', cardsId: []
-        }
-    }, // Facilitate reordering of the columns
-    columnOrder: ['1', '2', '3', '4'],
-    restCards: restOfCards,
-    DropedCards: [],
-    wildCards: randomIntFromInterval(1, 13),
+    deckOfCards: cardDeack, handCards: {}, columns: {}, // Facilitate reordering of the columns
+    columnOrder: [], restCards: restOfCards, DropedCards: [], wildCards: randomIntFromInterval(1, 13),
+
+    userData: [{
+        userId: 1, userName: "player1", userCash: 300, userTurn: false, userCardSet: object1, userCardColumnSet: {
+        }, columnOrder: ['1', '2', '3', '4'], userPlayTime: "play1", playerStatus: "Redy", activePlayer: false
+    }, {
+        userId: 2,
+        userName: "player2",
+        userCash: 300,
+        userTurn: false,
+        userCardSet: object2,
+        userPlayTime: "play2",
+        playerStatus: "Redy",
+        activePlayer: false,
+        columnOrder: ['1', '2', '3', '4'],
+        userCardColumnSet: {
+
+        },
+    }]
 }
 
 const cardDataReducer = (state = initialState, action) => {
     switch (action.type) {
         case cardsType.SORT_CARDS:
             return {
-                ...state, columns: action.payload
+                ...state,
+                handCards: action.cardsSet,
+                columns: action.payload,
+                columnOrder: action.columnOrder
             }
         case cardsType.UPDATE_DND:
             return {
@@ -71,24 +78,19 @@ const cardDataReducer = (state = initialState, action) => {
             }
         case cardsType.DROPEDCARDS:
             return {
-                ...state,
-                DropedCards: action.payload
+                ...state, DropedCards: action.payload
             }
         case cardsType.REMOVECLOSEDCARDS:
             return {
-                ...state,
-                restCards: action.payload
+                ...state, restCards: action.payload
             }
         case cardsType.REMOVEDROPEDCARDBYPLAYER:
             return {
-                ...state,
-                handCards: action.payload
+                ...state, handCards: action.payload
             }
         case cardsType.SETCARDSINSEQUENCEANDSET:
             return {
-                ...state,
-                columns: action.payload.columns,
-                columnOrder: action.payload.columnOrder
+                ...state, columns: action.payload.columns, columnOrder: action.payload.columnOrder
             }
         default:
             return state;
