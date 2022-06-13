@@ -145,8 +145,8 @@ import {type} from "@testing-library/user-event/dist/type";
 
 function gettingHand(cards) {
     let Hand = [];
-    for (let card in cards.handCards) {
-        Hand.push(cards.handCards[card].index)
+    for (let card in cards) {
+        Hand.push(cards[card].index)
     }
     return Hand
 }
@@ -171,8 +171,8 @@ function getColumnCardIds(setAndSequence,cardInHand){
 }
 
 export function setOrSequenceCards(cards, wildCard, cardInHand) {
-
-    var hand = gettingHand(cards);
+console.log(cardInHand)
+    var hand = gettingHand(cardInHand);
     hand.sort((a, b) => a - b);
 console.log(hand)
     const pureSequences = getPureSequences(hand, 3);

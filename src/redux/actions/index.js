@@ -29,8 +29,8 @@ export const removeDropedCardByPlayer = (data) => ({
     type: "REMOVEDROPEDCARDBYPLAYER", payload: data
 })
 
-export const setCardsInSeqAndSet = (data) =>({
- type: "SETCARDSINSEQUENCEANDSET",  payload :data
+export const setCardsInSeqAndSet = (data,cardData) =>({
+ type: "SETCARDSINSEQUENCEANDSET",  payload :data, data: cardData
 })
 
 export const storePlayerCards = (data) => ({

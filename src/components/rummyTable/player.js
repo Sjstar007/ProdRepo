@@ -1,4 +1,4 @@
-import React from './react';
+import React from 'react';
 import {useEffect, useState} from "@types/react";
 import userData from "./userData";
 import {useSelector} from "react-redux";

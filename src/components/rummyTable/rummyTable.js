@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useMemo} from "react";
+import React, {useEffect, useState, useMemo , memo} from "react";
 import "./main.css";
 import userData from './userData';
 import Dnd from './DragNDrop/index';
@@ -8,7 +8,8 @@ import {
     dropedCardsByPlayer, insterNewCardToPlayer, removeClosedCards, setCardsInSeqAndSet, sortCards,
 } from '../../redux/actions/index'
 
-export default function Index() {
+
+ const  Index = React.memo (() => {
     let dispatch = useDispatch();
     const [currentPlayerChance, setCurrentPlayerChance] = useState(0)
     const [totalPlayer, setTotalPlayer] = useState(userData.length-1)
@@ -24,48 +25,46 @@ export default function Index() {
         }
         setWildCardArray(wildCardArray)
     }
+     function sleep(ms) {
+         return new Promise(resolve => setTimeout(resolve, ms));
+     }
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+     const setTimerForPlayer = async (playerInfo) => {
+         for (let i = 1; i <= 35; i++) {
+             let seconds = document.getElementById(playerInfo.userPlayTime);
+             let ss = document.getElementById(playerInfo.userName)
+             seconds.innerHTML = (35 - i);
+             ss.style.strokeDashoffset = i * 12.5
+             await sleep(1000);
+         }
+         if (currentPlayerChance < totalPlayer) {
+             setCurrentPlayerChance(1)
+         } else {
+             setCurrentPlayerChance(0)
+         }
+     }
 
-    const setTimerForPlayer = async (playerInfo) => {
-        for (let i = 1; i <= 35; i++) {
-            let seconds = document.getElementById(playerInfo.userPlayTime);
-            let ss = document.getElementById(playerInfo.userName)
-            seconds.innerHTML = (35 - i);
-            ss.style.strokeDashoffset = i * 12.5
-            await sleep(1000);
-        }
-        if (currentPlayerChance < totalPlayer) {
-            setCurrentPlayerChance(1)
-        } else {
-            setCurrentPlayerChance(0)
-        }
-        return
-    }
 
-    useEffect(() => {
-        getWildCard()
-    }, [])
 
-    const startGame = async (event) => {
-        event.preventDefault()
-        while (true) {
-            await setTimerForPlayer(cardDetail.userData[currentPlayerChance])
-            await sleep(35000)
-        }
-    }
+     const startGame = useMemo(async () => {
+         while (true) {
+             await setTimerForPlayer(cardDetail.userData[currentPlayerChance])
+             await sleep(35000)
+         }
+     })
     // const callStartGame =  useMemo(async () => startGame(),[currentPlayerChance] )
 
     const setOrSequence = (event, cards) => {
         event.preventDefault()
-        let setAndSeuqence = setOrSequenceCards(cards, cardDetail.wildCards, cardDetail.handCards)
+        // console.log()
+        let setAndSeuqence = setOrSequenceCards(cards, cardDetail.wildCards,cardDetail.userData[currentPlayerChance].userCardSet)
         console.log(setAndSeuqence)
-        dispatch(setCardsInSeqAndSet(setAndSeuqence))
+        cardDetail.userData[currentPlayerChance].userCardColumnSet = setAndSeuqence.columns
+        cardDetail.userData[currentPlayerChance].columnOrder = setAndSeuqence.columnOrder
+        dispatch(setCardsInSeqAndSet(setAndSeuqence,cardDetail))
     }
 
-    const dropSelectedCards = (event, cards) => {
+    const dropSelectedCards = (event, cards,currentPlayer) => {
         event.preventDefault();
         let keys = [];
         Object.values(cards.handCards).map(card => {
@@ -74,17 +73,28 @@ export default function Index() {
             }
         })
         dispatch(dropedCardsByPlayer(keys))
+        // console.log(keys)
         let newColumn = {}
         Object.keys(clone.columns).map((column, id) => {
             return Object.values(clone.columns[column].cardsId).map((data, index) => {
                 if (data === keys[0]) {
+
                     clone.columns[column].cardsId.splice(index, 1)
                 }
             })
         })
-        console.log(clone)
+        // console.log(clone)
+        Object.keys(clone.userData[currentPlayerChance].userCardColumnSet).map((column, id) => {
+            return Object.values(clone.userData[currentPlayerChance].userCardColumnSet[column].cardsId).map((data, index) => {
+                if (data === keys[0]) {
+                    clone.userData[currentPlayerChance].userCardColumnSet[column].cardsId.splice(index, 1)
+                }
+            })
+        })
     }
-
+     useEffect(() => {
+         getWildCard()
+     }, [])
     const getPlayer = (user) => {
         return (<div className="time" key={user.userId}>
             {/* <div className="circle" > */}
@@ -118,10 +128,10 @@ export default function Index() {
 
     const getDropedCards = (cards) => {
         return (<div className="closedCard">
-            <span className="number top">{cardDetail.handCards[cards].cardName}</span>
-            <p className="suit_top">{cardDetail.handCards[cards].icon}</p>
-            <p className="suit">{cardDetail.handCards[cards].icon}</p>
-            <span className="number bottom">{cardDetail.handCards[cards].cardName}</span>
+            <span className="number top">{clone.handCards[cards].cardName}</span>
+            <p className="suit_top">{clone.handCards[cards].icon}</p>
+            <p className="suit">{clone.handCards[cards].icon}</p>
+            <span className="number bottom">{clone.handCards[cards].cardName}</span>
         </div>)
     }
 
@@ -133,6 +143,7 @@ export default function Index() {
             <span className="number bottom">{cardDetail.deckOfCards[card].cardName}</span>
         </div>)
     }
+
     const showToolTip = (event) => {
         event.preventDefault();
         setToolTipOption(!toolTipOption)
@@ -164,7 +175,7 @@ export default function Index() {
             <div className="Exit">
                 <h5>Leave Table</h5>
             </div>
-            <button onClick={e => startGame(e)}>Start Game</button>
+            <button onClick={startGame}>Start Game</button>
         </div>
         <div className="TablePool">
             <div className="multiPlayer"/>
@@ -183,7 +194,7 @@ export default function Index() {
                         </div>)}
                     </div>
                     <div className="openDeck">
-                        {clone.DropedCards.reverse().map((card) => getDropedCards(card))}
+                        {!!clone.DropedCards.length && clone.DropedCards.reverse().map((card) => getDropedCards(card))}
                     </div>
                     <div className="finishSlot">
                         <h3>Finish Slot</h3>
@@ -195,9 +206,11 @@ export default function Index() {
                 {!!userData.length && userData.map(user => getPlayer(user))}
                 <div className="playerOptions">
                     <button onClick={event => setOrSequence(event, cardDetail)} className="sortbtn">Sort</button>
-                    <button className="dropbtn" onClick={e => dropSelectedCards(e, cardDetail)}>Drop</button>
+                    <button className="dropbtn" onClick={e => dropSelectedCards(e, clone,currentPlayerChance)}>Drop</button>
                 </div>
             </div>
         </div>
     </div>);
-}
+})
+
+export default memo(Index);

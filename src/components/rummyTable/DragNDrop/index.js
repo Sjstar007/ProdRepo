@@ -6,7 +6,7 @@ import store from '../../../redux/store';
 import styled from 'styled-components'
 import Column from "./column";
 
-function Dnd(currentPlayerChance) {
+const Dnd = React.memo(({currentPlayerChance}) => {
     let dispatch = useDispatch();
     const Container = styled.div`display: flex;`
     const cardDetail = useSelector(state => state.card_data);
@@ -67,19 +67,22 @@ function Dnd(currentPlayerChance) {
         let result = setColumns(concat)
         return result;
     }
-console.log(currentPlayerChance)
+    // const checkPrevState = (prevState,nextState){
+    //     JSON.stringify(prevCount) !== JSON.stringify(currentPlayerChance)
+    // }
     useEffect(() => {
         // let isCancled = false;
         const data = store.getState().card_data
-        let result = getClumnData(currentPlayerChance.currentPlayerChance.userCardSet)
+        let result = getClumnData(currentPlayerChance.userCardSet)
         getWildCards()
         if(prevCount == undefined || JSON.stringify(prevCount) !== JSON.stringify(currentPlayerChance)){
-            dispatch(sortCards(result, currentPlayerChance.currentPlayerChance.userId, currentPlayerChance.currentPlayerChance.userCardSet, currentPlayerChance.currentPlayerChance.columnOrder))
+            dispatch(sortCards(result, currentPlayerChance.userId, currentPlayerChance.userCardSet, currentPlayerChance.columnOrder))
         }
         // return ()=>{
         //     isCancled = true;
         // }
     }, [currentPlayerChance])
+
 
     const onDragEnd = result => {
         const {destination, source, draggableId} = result
@@ -136,5 +139,7 @@ console.log(currentPlayerChance)
             })}
         </Container>
     </DragDropContext>)
-}
-export default memo(Dnd);
+
+});
+
+export default Dnd;

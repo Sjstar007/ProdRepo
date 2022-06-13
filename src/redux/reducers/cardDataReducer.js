@@ -77,8 +77,9 @@ const cardDataReducer = (state = initialState, action) => {
                 ...state, handCards: action.payload
             }
         case cardsType.DROPEDCARDS:
+            const concat  = action.payload;
             return {
-                ...state, DropedCards: action.payload
+                ...state, DropedCards: concat
             }
         case cardsType.REMOVECLOSEDCARDS:
             return {
@@ -89,8 +90,9 @@ const cardDataReducer = (state = initialState, action) => {
                 ...state, handCards: action.payload
             }
         case cardsType.SETCARDSINSEQUENCEANDSET:
+            console.log(action)
             return {
-                ...state, columns: action.payload.columns, columnOrder: action.payload.columnOrder
+                ...state, columns: action.payload.columns, columnOrder: action.payload.columnOrder, userData: action.data.userData
             }
         default:
             return state;

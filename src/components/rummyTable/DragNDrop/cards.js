@@ -17,6 +17,7 @@ export default function Cards ({key, cardDetails, index, wildCard}) {
     const [cardStateData,setCardStateData] = useState(useSelector(state => state.card_data));
     const  clickMe = (event,cards) =>{
         event.preventDefault()
+        // console.log(cards)
         cards.isSelected = true;
         cardStateData.handCards[cards.index] = cards
         dispatch(selectMultiCards(cardStateData.handCards))
